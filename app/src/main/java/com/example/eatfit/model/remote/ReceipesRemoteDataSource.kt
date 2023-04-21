@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
-class ReceipesRemoteDataSource @Inject constructor() {
+class ReceipesRemoteDataSource @Inject constructor(){
 
     private val retrofit = RetrofitHelper.getRetrofit()
     private val apiKey = "0354b5e62cc34249800d0b5e41c5b29a"

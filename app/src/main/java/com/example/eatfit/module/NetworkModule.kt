@@ -1,5 +1,6 @@
 package com.example.eatfit.module
 
+import com.example.eatfit.model.remote.ReceipesApiClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,5 +21,11 @@ object NetworkModule {
             .baseUrl("https://api.spoonacular.com")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideReceipeApiClient(retrofit: Retrofit): ReceipesApiClient{
+        return retrofit.create(ReceipesApiClient::class.java)
     }
 }
