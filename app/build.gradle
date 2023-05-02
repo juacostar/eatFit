@@ -43,6 +43,10 @@ android {
 
 dependencies {
 
+    def nav_version = "2.5.3"
+    // navigation jetpack compose
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
     // jetpack compose
     implementation "androidx.compose.material:material:1.3.0-rc01"
     implementation "androidx.compose.compiler:compiler:1.3.2"
@@ -79,4 +83,9 @@ dependencies {
 
     // render image for jetpack compose
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
+    // Room: local ORM
+    //Room
+    implementation "androidx.room:room-ktx:2.4.0"
+    kapt "androidx.room:room-compiler:2.4.0"
 }

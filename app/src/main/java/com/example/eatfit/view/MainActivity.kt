@@ -30,10 +30,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
+import androidx.navigation.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.Glide
 import com.example.eatfit.model.dto.Receipe
 import com.example.eatfit.viewmodel.HomeViewModel
+import com.example.eatfit.viewmodel.RecipeDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
@@ -41,7 +46,10 @@ import kotlinx.coroutines.delay
 class MainActivity : ComponentActivity() {
 
     private var recipes = mutableListOf<Receipe>()
+    private var recipeDetail: Receipe? = null
     private val viewModel by viewModels<HomeViewModel>()
+    private val detailViewModel by viewModels<RecipeDetailViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,19 +73,37 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    @Preview
     @Composable
     fun recyclerview(
-        viewModel: HomeViewModel = this.viewModel
+        modifier: Modifier = Modifier,
+        viewModel: HomeViewModel = this.viewModel,
+        navController: NavHostController = rememberNavController()
     ){
 
-       contentRecycler(recipes = recipes)
+        NavHost(
+            navController = navController,
+            modifier = modifier,
+            startDestination = "root"){
+
+            composable("root"){
+                contentRecycler(recipes = recipes, navHostController = navController)
+            }
+            
+            composable("recipeDetail/{id}",
+            arguments = listOf(navArgument("id"){type = NavType.IntType})
+            ){
+                activityDetailRecipe(id = it.arguments!!.getInt("id"))
+            }
+
+        }
     }
 
 
 
     @Composable
-    fun contentRecycler(recipes: List<Receipe>){
+    fun contentRecycler(
+        recipes: List<Receipe>,
+        navHostController: NavHostController){
 
         LazyColumn (
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -89,7 +115,7 @@ class MainActivity : ComponentActivity() {
             items(
                 items = recipes ,
                 itemContent = {
-                    recipeDetail(receipe = it)
+                    recipeDetail(receipe = it, navController = navHostController)
                 }
             )
         }
@@ -97,17 +123,22 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun recipeDetail(receipe: Receipe){
+    fun recipeDetail(
+        receipe: Receipe,
+        navController: NavHostController){
         Row() {
            Card(
 
                modifier = Modifier
                    .padding(10.dp)
                    .clickable {
-                       val intent = Intent(this@MainActivity, RecipeDetailActivity::class.java)
-                       intent.putExtra("title", receipe.title)
-                       intent.putExtra("image", receipe.image)
-                       intent.putExtra("summary", receipe.summary)
+//                       val intent = Intent(this@MainActivity, RecipeDetailActivity::class.java)
+//                       intent.putExtra("title", receipe.title)
+//                       intent.putExtra("image", receipe.image)
+//                       intent.putExtra("summary", receipe.summary)
+                        navController.navigate("recipeDetail/" + receipe.id){
+
+                        }
                    }
            ) {
                Row {
@@ -137,6 +168,40 @@ class MainActivity : ComponentActivity() {
 //                Icons.Rounded.KeyboardArrowRight
 //            }
         }
+
+    }
+
+    @Composable
+    fun activityDetailRecipe(
+        id: Int,
+        viewModel: RecipeDetailViewModel = this.detailViewModel){
+        viewModel.onCreate(id)
+
+        //spinner
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+        }
+
+        detailViewModel.recipe.observe(this, Observer(){
+            this.recipeDetail = it
+            setContent {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Image(
+                        painter = rememberAsyncImagePainter(model = recipeDetail!!.image),
+                        contentDescription = null)
+                    Text(text = recipeDetail!!.title)
+                }
+            }
+        })
 
     }
 

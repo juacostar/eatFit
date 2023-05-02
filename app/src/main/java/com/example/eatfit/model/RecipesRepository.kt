@@ -26,5 +26,9 @@ class RecipesRepository @Inject constructor(
         return receipesRemoteDataSource.findOneReceipe(id).body()!!
     }
 
+    suspend fun findAllLocalRecipes(){
+        
+    }
+
 
 }
