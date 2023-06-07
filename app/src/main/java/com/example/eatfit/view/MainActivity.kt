@@ -16,6 +16,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -35,7 +37,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import com.bumptech.glide.Glide
+import com.example.eatfit.model.dto.ExtendedIngredient
 import com.example.eatfit.model.dto.Receipe
 import com.example.eatfit.viewmodel.HomeViewModel
 import com.example.eatfit.viewmodel.RecipeDetailViewModel
@@ -126,19 +130,18 @@ class MainActivity : ComponentActivity() {
     fun recipeDetail(
         receipe: Receipe,
         navController: NavHostController){
+
+        var ingredientsRecipes = ""
+        for (ingredient in receipe.extendedIngredients) ingredientsRecipes += ingredient.original
+
         Row() {
            Card(
 
                modifier = Modifier
                    .padding(10.dp)
                    .clickable {
-//                       val intent = Intent(this@MainActivity, RecipeDetailActivity::class.java)
-//                       intent.putExtra("title", receipe.title)
-//                       intent.putExtra("image", receipe.image)
-//                       intent.putExtra("summary", receipe.summary)
-                        navController.navigate("recipeDetail/" + receipe.id){
-
-                        }
+                       navController.navigate("recipeDetail/" + receipe.id) {
+                       }
                    }
            ) {
                Row {
@@ -147,13 +150,43 @@ class MainActivity : ComponentActivity() {
                        contentDescription = null,
                        modifier = Modifier.size(128.dp)
                    )
-                   Text(text = receipe.title,
-                       fontFamily = poppinsFontFamily,
-
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(16.dp)
-                       .size(20.dp))
+                   Spacer(modifier = Modifier.width(20.dp))
+                   Column {
+                       Spacer(modifier = Modifier.height(20.dp))
+                       Text(text = receipe.title,
+                           fontFamily = poppinsFontFamily,
+                           modifier = Modifier
+                               .fillMaxWidth()
+                               .size(20.dp))
+                       Spacer(modifier = Modifier.height(30.dp))
+                       Row {
+                           Column {
+                               Icon( imageVector = Icons.Rounded.Favorite
+                                   , contentDescription = receipe.aggregateLikes.toString(),
+                                   modifier = Modifier
+                                       .padding(0.dp)
+                                       .size(20.dp))
+                               Text(text = receipe.aggregateLikes.toString(),
+                                   fontFamily = poppinsFontFamily,
+                                   modifier = Modifier
+                                       .padding(3.dp)
+                                       .size(20.dp))
+                           }
+                           Column {
+                               Icon( imageVector = Icons.Rounded.DateRange
+                                   , contentDescription = receipe.readyInMinutes.toString(),
+                                   modifier = Modifier
+                                       .padding(0.dp)
+                                       .size(20.dp))
+                               Text(text = receipe.readyInMinutes.toString(),
+                                   fontFamily = poppinsFontFamily,
+                                   modifier = Modifier
+                                       .padding(3.dp)
+                                       .size(20.dp))
+                           }
+                       }
+                       
+                   }
 
 //                   Text(text = receipe.)
 
